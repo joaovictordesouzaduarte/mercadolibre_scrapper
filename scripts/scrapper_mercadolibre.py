@@ -4,13 +4,17 @@ import pandas as pd
 from selenium.common.exceptions import NoSuchElementException
 from datetime import datetime
 import io
-# from ..utils.s3.upload_s3 import put_object
-from utils.s3.upload_s3 import put_object
+from ..utils.s3.upload_s3 import put_object
+#from utils.s3.upload_s3 import put_object
 
-AWS_ACCESS_KEY_ID = "AKIARIQLV2TVKLUQTOMF"
-AWS_SECRET_ACCESS_KEY = "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"
-AWS_BUCKET_NAME = 'mercado-libre-scrapping-prices'
-AWS_REGION = 'us-east-1'
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_BUCKET_NAME = os.getenv('AWS_BUCKET_NAME')
+AWS_REGION = os.getenv('AWS_REGION')
 
 
 def get_browser(headless=True):
@@ -126,12 +130,14 @@ def extract_data_from_website(browser):
 def save():
     # Instance of webdriver
     browser = get_browser()
+    data = None
     try:
-        data = extract_data_from_website(browser)
-        df_data = _transform_in_data_frame(data)
-        in_memory_file = _export_to_csv(df_data)
-        current_date = datetime.now().strftime('%Y-%m-%d')
-        put_object(AWS_BUCKET_NAME, AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,in_memory_file.getvalue(), f'dados_mercadolivre_{current_date}.csv')
+        print(AWS_ACCESS_KEY_ID)
+        #data = extract_data_from_website(browser)
+        #df_data = _transform_in_data_frame(data)
+        #in_memory_file = _export_to_csv(df_data)
+        #current_date = datetime.now().strftime('%Y-%m-%d')
+        #put_object(AWS_BUCKET_NAME, AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,in_memory_file.getvalue(), f'dados_mercadolivre_{current_date}.csv')
 
         print('------------- DADO EXTRAÍDO E SALVO NO S3 -------------')
     except Exception as ex:
