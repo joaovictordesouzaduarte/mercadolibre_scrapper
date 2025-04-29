@@ -1,16 +1,18 @@
+import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-import pandas as pd
 from selenium.common.exceptions import NoSuchElementException
 from datetime import datetime
 import io
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils')))
-
 from s3.upload_s3 import put_object
-
+#from ..utils.s3.upload_s3 import put_object
 from dotenv import load_dotenv
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 import os
 
 load_dotenv()
@@ -22,13 +24,15 @@ AWS_REGION = os.getenv('AWS_REGION')
 
 
 def get_browser(headless=True):
-    options = webdriver.ChromeOptions()
+    options = Options()
     options.add_argument("--start-maximized")
-
+    options.add_argument('--disable-dev-shm-usage')
+    
     if headless:
         options.add_argument("--headless=new")
 
-    driver = webdriver.Chrome(options=options)
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=options)
 
     return driver
 
@@ -73,7 +77,7 @@ def extract_data_from_website(browser):
     data = []
 
     # Looping over each pages and get all the data inside each product
-    for i in range(1, number_of_pages):
+    for i in range(1, 2):
         print(f"------------------- Page started: {i} -------------------")
         # Items container
         itens = browser.find_element(
@@ -133,7 +137,7 @@ def extract_data_from_website(browser):
 
 def save():
     # Instance of webdriver
-    browser = get_browser(False)
+    browser = get_browser()
     data = None
     try:
         data = extract_data_from_website(browser)
