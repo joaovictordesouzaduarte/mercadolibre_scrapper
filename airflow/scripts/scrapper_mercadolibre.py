@@ -14,7 +14,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 import os
-
+import tempfile
 load_dotenv()
 
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -27,9 +27,9 @@ def get_browser(headless=True):
     options = Options()
     options.add_argument("--start-maximized")
     options.add_argument('--disable-dev-shm-usage')
-    
+    options.add_argument('--user-data-dir=/home/trash/final')
     if headless:
-        options.add_argument("--headless=new")
+        options.add_argument("--headless")
 
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=options)
@@ -58,7 +58,7 @@ def extract_data_from_website(browser):
     browser.get("https://www.mercadolivre.com.br/")
     browser.implicitly_wait(5)
 
-    # Moving to "Ofertas" aka "Sale"
+    # Moving to "Ofertas" aka "Sales"
     browser.find_element(
         By.XPATH, "/html/body/header/div/div[5]/div/ul/li[2]/a"
     ).click()
