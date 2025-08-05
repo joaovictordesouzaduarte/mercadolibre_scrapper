@@ -1,0 +1,28 @@
+FROM public.ecr.aws/lambda/python:3.10 as stage
+
+RUN yum install -y -q sudo unzip
+
+ENV CHROMIUM_VERSION=1002910
+
+COPY scripts/install-browser.sh /tmp/
+RUN /usr/bin/bash /tmp/install-browser.sh
+
+FROM public.ecr.aws/lambda/python:3.10 as base
+
+COPY chrome-deps.txt /tmp/
+RUN yum install -y $(cat /tmp/chrome-deps.txt)
+
+# Instalar dependências Python no diretório do Lambda
+COPY scripts/requirements.txt .
+RUN pip install -r requirements.txt --target "${LAMBDA_TASK_ROOT}" --no-cache-dir
+
+COPY --from=stage /opt/chrome /opt/chrome
+COPY --from=stage /opt/chromedriver /opt/chromedriver
+# Copiar o handler Lambda
+COPY scripts/lambda_scrapper_mercadolibre.py ${LAMBDA_TASK_ROOT}
+
+# Declarar o volume para screenshots
+VOLUME ["/mnt/output"]
+
+# Definir o handler
+CMD ["lambda_scrapper_mercadolibre.lambda_handler"]

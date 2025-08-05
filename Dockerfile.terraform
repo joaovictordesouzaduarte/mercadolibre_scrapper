@@ -1,0 +1,46 @@
+# Use a imagem oficial do Ubuntu como base
+FROM ubuntu:latest
+
+# Mantenedor da imagem (opcional)
+LABEL maintainer="ml_scrapper"
+
+# Definir argumento para versão do Terraform (recebe do docker-compose)
+ARG TERRAFORM_VERSION=1.12.2
+ENV TERRAFORM_VERSION=${TERRAFORM_VERSION}
+
+# Atualizar pacotes e instalar dependências
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    curl \
+    dnsutils \
+    iputils-ping \
+    && rm -rf /var/lib/apt/lists/*
+
+# Baixar e instalar Terraform
+RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+    unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+    mv terraform /usr/local/bin/ && \
+    rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+
+# Copiando o conteúdo do diretório scripts para o container
+RUN mkdir -p /mercadolibre_scrapper
+COPY scripts /mercadolibre_scrapper/scripts
+COPY Dockerfile.lambda /mercadolibre_scrapper/Dockerfile.lambda
+COPY chrome-deps.txt /mercadolibre_scrapper/chrome-deps.txt
+
+# COPY aws-configure-entrypoint.sh /mercadolibre_scrapper/scripts/aws-configure-entrypoint.sh
+# Copiando o conteúdo do diretório terraform para o container
+COPY terraform /mercadolibre_scrapper/terraform
+
+# Criar a pasta Downloads e instalar o AWS CLI (para acessar a AWS)
+RUN mkdir Downloads && \
+    cd Downloads && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
+
+# Definir o comando padrão para execução quando o container for iniciado
+# ENTRYPOINT ["/mercadolibre_scrapper/scripts/aws-configure-entrypoint.sh"]
+
+CMD ["/bin/bash"]

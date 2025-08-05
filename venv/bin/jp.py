@@ -1,4 +1,4 @@
-#!/home/victor/Documentos/projetos/python/scrapping_mercado_libre/venv/bin/python
+#!/home/joaovictor/projects/python/mercadolibre_scrapper/venv/bin/python3
 
 import sys
 import json
