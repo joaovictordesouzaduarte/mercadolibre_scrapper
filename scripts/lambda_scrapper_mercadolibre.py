@@ -13,6 +13,7 @@ import os
 import tempfile
 import platform
 
+
 def get_browser(headless=True):
     
     chrome_options = webdriver.ChromeOptions()
