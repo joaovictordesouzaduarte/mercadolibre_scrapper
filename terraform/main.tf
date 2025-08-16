@@ -1,37 +1,45 @@
-resource "aws_ecr_repository" "mercadolibre_scrapper_repository" {
-  name = var.ecr_repository_name
-    image_scanning_configuration {
-        scan_on_push = true
-  }
-}
-resource "null_resource" "docker_push" {
-  # triggers = {
-  #   dockerfile_changes = filemd5("${path.root}/../Dockerfile.lambda")
-  #   script_changes     = filemd5("${path.root}/../scripts/lambda_scrapper_mercadolibre.py")
-  # }
+# resource "aws_ecr_repository" "mercadolibre_scrapper_repository" {
+#   name = var.ecr_repository_name
+#     image_scanning_configuration {
+#         scan_on_push = true
+#   }
+# }
+# Criando a role para a lambda function
+resource "aws_iam_role" "lambda_exec_role" {
+  name = "lambda-exec-role"
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      # Login no ECR
-      aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repository.mercadolibre_scrapper_repository.repository_url}
-      
-      # Build da imagem
-      docker build -f ${path.root}/../Dockerfile.lambda -t mercadolibre-scrapper ${path.root}/../
-      
-      # Tag da imagem
-      docker tag mercadolibre-scrapper:latest ${aws_ecr_repository.mercadolibre_scrapper_repository.repository_url}:latest
-      
-      # Push da imagem
-      docker push ${aws_ecr_repository.mercadolibre_scrapper_repository.repository_url}:latest
-    EOT
-  }
-
-  depends_on = [aws_ecr_repository.mercadolibre_scrapper_repository]
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
 }
-output "ecr_repo_url" {
-  value = aws_ecr_repository.mercadolibre_scrapper_repository.repository_url
+# Criando a policy para a lambda function
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-output "ecr_repo_arn" {
-  value = aws_ecr_repository.mercadolibre_scrapper_repository.arn
+# Criando a lambda function
+resource "aws_lambda_function" "mercadolibre_scrapper_lambda" {
+  function_name = var.lambda_function_name
+  image_uri = "086997587178.dkr.ecr.us-east-2.amazonaws.com/mercadolibre-scrapper-repository:latest"
+  package_type = "Image"
+  role = aws_iam_role.lambda_exec_role.arn
+  handler = "lambda_scrapper_mercadolibre.lambda_handler"
+  
 }
+# output "ecr_repo_url" {
+#   value = aws_ecr_repository.mercadolibre_scrapper_repository.repository_url
+# }
+
+# output "ecr_repo_arn" {
+#   value = aws_ecr_repository.mercadolibre_scrapper_repository.arn
+# }
