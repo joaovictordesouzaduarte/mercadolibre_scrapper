@@ -1,9 +1,3 @@
-# resource "aws_ecr_repository" "mercadolibre_scrapper_repository" {
-#   name = var.ecr_repository_name
-#     image_scanning_configuration {
-#         scan_on_push = true
-#   }
-# }
 # Criando a role para a lambda function
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda-exec-role"
@@ -34,12 +28,11 @@ resource "aws_lambda_function" "mercadolibre_scrapper_lambda" {
   package_type = "Image"
   role = aws_iam_role.lambda_exec_role.arn
   handler = "lambda_scrapper_mercadolibre.lambda_handler"
-  
+  timeout = 900
+  memory_size = 2048
+  environment {
+    variables = {
+      ECR_REPO_URL = "086997587178.dkr.ecr.us-east-2.amazonaws.com/mercadolibre-scrapper-repository"
+    }
+  }
 }
-# output "ecr_repo_url" {
-#   value = aws_ecr_repository.mercadolibre_scrapper_repository.repository_url
-# }
-
-# output "ecr_repo_arn" {
-#   value = aws_ecr_repository.mercadolibre_scrapper_repository.arn
-# }

@@ -2,23 +2,26 @@ import io
 import pandas as pd
 from datetime import datetime
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from webdriver_manager.chrome import ChromeDriverManager
 import os
 import tempfile
-import platform
+import boto3
+from botocore.exceptions import ClientError
+import logging
 
-
-def get_browser(headless=True):
+def get_browser():
     
     chrome_options = webdriver.ChromeOptions()
     chrome_options.binary_location = "/opt/chrome/chrome"
     chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument(f"--user-data-dir={tempfile.mkdtemp()}")
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("user-agent=Mozilla/5.0 ...")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
@@ -37,6 +40,24 @@ def get_browser(headless=True):
         print(f"Erro ao iniciar Chrome: {e}")
         raise
 
+
+def upload_file_to_s3(buffer, bucket_name, object_name=None):
+    """Upload a file to an S3 bucket.
+
+    :param file_path: Path to the local file to upload.
+    :param bucket_name: Name of the S3 bucket.
+    :param object_name: S3 object name. If not specified, the base name of file_path is used.
+    :return: True if file was uploaded, else False.
+    """
+    s3_client = boto3.client('s3', aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'), aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
+    try:
+        s3_client.put_object(Bucket=bucket_name, Key=object_name, Body=buffer.getvalue())
+        logging.info(f"File '{buffer}' uploaded to '{bucket_name}/{object_name}'")
+        return True
+    except ClientError as e:
+        logging.error(e)
+         
+        return False
 def _transform_in_data_frame(data: dict): 
     if data:
         df_data = pd.DataFrame(data=data)
@@ -44,45 +65,49 @@ def _transform_in_data_frame(data: dict):
 
 def _export_to_csv(dataframe: pd.DataFrame) -> bytes:
     # Instance of a memory
-    io_file = io.BytesIO()
-    dataframe.to_csv(io_file, index=False, encoding='latin-1')
-    return io_file
+    csv_buffer = io.StringIO()
+    dataframe.to_csv(csv_buffer, index=False, encoding='latin-1')
+    return csv_buffer
 
 def extract_data_from_website(browser):
     try:
         # Moving to Mercado Livre website
         browser.get("https://www.mercadolivre.com.br/ofertas#nav-header")
-        browser.implicitly_wait(10)
         print("Acessando Mercado Livre...")
         PAGE_SOURCE = browser.page_source
 
-        # Get number of pages to iter over each and get data
-
-        number_of_pages = int(
-            browser.find_elements(By.CLASS_NAME, "andes-pagination__button")[-2]
-            .find_element(By.CLASS_NAME, "andes-pagination__link")
-            .text
-        ) - 18
+        wait = WebDriverWait(browser, 12)
+        # Desabilita implicit waits para evitar atrasos em elementos opcionais
+        browser.implicitly_wait(0)
 
         # Accept the cookies
         try:
-            browser.find_element(
-                By.XPATH, "/html/body/div[1]/div[1]/div/div[2]/button[1]"
-            ).click()
+            wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[1]/div/div[2]/button[1]"))).click()
             print("Cookies aceitos")
         except:
             print("Botão de cookies não encontrado ou já aceito")
 
-        data = []
+        # Wait for items to be present on the page
+        wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "andes-card")))
+
+        # Get number of pages to iter over each and get data (if needed later)
+        try:
+            # Get only the first five pages
+            pages = browser.find_elements(By.CLASS_NAME, "andes-pagination__button")[:5]
+        except Exception as ex:
+            raise Exception("Não foi possível obter o número de páginas")
 
         # Looping over each pages and get all the data inside each product
-        for i in range(1, 2):
-            print(f"------------------- Page started: {i} -------------------")
-            # Items container
-            itens = browser.find_element(
-                By.XPATH, "/html/body/main/div/section/div[2]/div"
-            ).find_elements(By.CLASS_NAME, "andes-card")
+        data = []
+        for i, page in enumerate(pages):
 
+            if i == 0:
+                continue
+            print(f"------------------- Page started: {i} -------------------")
+            browser.get(f"https://www.mercadolivre.com.br/ofertas?page={i}")
+            # Items container
+            itens_container = browser.find_element(By.XPATH, "/html/body/main/div/section/div[2]/div")
+            itens = itens_container.find_elements(By.CLASS_NAME, "andes-card")
             for item in itens:
                 try:
                     #Obtendo todo o conteúdo do produto
@@ -91,12 +116,11 @@ def extract_data_from_website(browser):
                     #Obtendo nome
                     product_name = product_content.find_element(By.CLASS_NAME, "poly-component__title").text
 
-                    # Checando se há o elemento span com a classe poly-component__seller
-                    seller_name = None
-                    try:
-                        seller_name = product_content.find_element(By.CLASS_NAME, 'poly-component__seller').text.replace('Por ', '')
-                    except NoSuchElementException:
-                        print(f'Produto {product_name} não possui nome do vendedor.')
+                    # Checando se há o elemento span com a classe poly-component__seller via JS (mais rápido e sem esperas)
+                    seller_name = browser.execute_script(
+                        "const el = arguments[0].querySelector('.poly-component__seller'); return el ? el.innerText.replace(/^Por\\s+/, '') : null;",
+                        product_content
+                    )
                     
                     product_price_component = product_content.find_element(By.CLASS_NAME, 'poly-component__price')
                     current_price = float(product_price_component.find_element(By.CLASS_NAME, 'poly-price__current').find_element(By.CLASS_NAME, 'andes-money-amount__fraction').text)
@@ -131,6 +155,8 @@ def extract_data_from_website(browser):
         return []
 
 def lambda_handler(event, context):
+# def lambda_handler():
+    print("Iniciando scrapper...")
     # Instance of webdriver
     browser = get_browser()
     
@@ -138,23 +164,20 @@ def lambda_handler(event, context):
         print('------------- Chrome iniciado com sucesso ----------------')
         # Extract data from website
         data = extract_data_from_website(browser)
-        # if data:
-        #     # Transform data into dataframe
-        #     df = _transform_in_data_frame(data)
+        if data:
+            # Transform data into dataframe
+            df = _transform_in_data_frame(data)
+            # Export to CSV
+            buffer = _export_to_csv(df)
+            current_date = datetime.now().strftime('%Y_%m_%d')
             
-        #     # Export to CSV
-        #     csv_data = _export_to_csv(df)
-        #     current_date = datetime.now().strftime('%Y_%m_%d')
-            
-        #     # Save to file
-        #     print('------------- Salvando dados em CSV ----------------')
-        #     # Volta uma pasta e salva na pasta data
-        #     with open(f'data/mercadolibre_data_{current_date}.csv', 'wb') as f:
-        #         f.write(csv_data.getvalue())
-            
-        #     print(f"Dados salvos com sucesso! {len(data)} produtos extraídos.")
-        # else:
-        #     print("Nenhum dado foi extraído.")
+            # Save to file
+            print('------------- Salvando dados em CSV ----------------')            
+            # Salva no S3
+            upload_file_to_s3(buffer, 'mercadolibre-scrapper-data', f'mercadolibre_data_{current_date}.csv')
+            print(f"Dados salvos com sucesso! {len(data)} produtos extraídos.")
+        else:
+            print("Nenhum dado foi extraído.")
             
     except Exception as e:
         print('--------------------------------- Erro durante a execução: {e}')
@@ -162,3 +185,6 @@ def lambda_handler(event, context):
         # Close browser
         browser.quit()
         print("Navegador fechado.")
+
+if __name__ == '__main__':
+    lambda_handler()
