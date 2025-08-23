@@ -49,7 +49,7 @@ def upload_file_to_s3(buffer, bucket_name, object_name=None):
     :param object_name: S3 object name. If not specified, the base name of file_path is used.
     :return: True if file was uploaded, else False.
     """
-    s3_client = boto3.client('s3', aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'), aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
+    s3_client = boto3.client('s3')
     try:
         s3_client.put_object(Bucket=bucket_name, Key=object_name, Body=buffer.getvalue())
         logging.info(f"File '{buffer}' uploaded to '{bucket_name}/{object_name}'")

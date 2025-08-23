@@ -25,11 +25,10 @@ RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform
 
 # Copiando o conteúdo do diretório scripts para o container
 RUN mkdir -p /mercadolibre_scrapper
-COPY scripts /mercadolibre_scrapper/scripts
-COPY Dockerfile.lambda /mercadolibre_scrapper/Dockerfile.lambda
 COPY chrome-deps.txt /mercadolibre_scrapper/chrome-deps.txt
 
-# COPY aws-configure-entrypoint.sh /mercadolibre_scrapper/scripts/aws-configure-entrypoint.sh
+COPY aws-configure-entrypoint.sh /mercadolibre_scrapper/scripts/aws-configure-entrypoint.sh
+RUN chmod +x /mercadolibre_scrapper/scripts/aws-configure-entrypoint.sh
 # Copiando o conteúdo do diretório terraform para o container
 COPY terraform /mercadolibre_scrapper/terraform
 
@@ -41,6 +40,6 @@ RUN mkdir Downloads && \
     ./aws/install
 
 # Definir o comando padrão para execução quando o container for iniciado
-# ENTRYPOINT ["/mercadolibre_scrapper/scripts/aws-configure-entrypoint.sh"]
+ENTRYPOINT ["/mercadolibre_scrapper/scripts/aws-configure-entrypoint.sh"]
 
 CMD ["/bin/bash"]
