@@ -1,3 +1,13 @@
+# Criando o bucket s3
+resource "aws_s3_bucket" "mercadolibre_scrapper_data" {
+  bucket = var.bucket_name
+  force_destroy = true
+  tags = {
+    Name = "Bucket para salvar os arquivos .csv"
+    Environment = "Scripts"
+  }
+}
+
 # Criando a role para a lambda function
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda-exec-role"
@@ -60,7 +70,7 @@ resource "aws_lambda_function" "mercadolibre_scrapper_lambda" {
   image_uri = "${data.aws_ecr_repository.mercadolibre_scrapper_repository.repository_url}@${data.aws_ecr_image.mercadolibre_scrapper_image.image_digest}"
 
   timeout     = 900
-  memory_size = 4096
+  memory_size = 3008
 
   environment {
     variables = {

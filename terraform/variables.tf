@@ -2,6 +2,10 @@ variable "aws_region" {
   type    = string
   description = "AWS region"
 }
+variable "bucket_name" {
+  type    = string
+  description = "Bucket name"
+}
 variable "ecr_repository_name" {
   type    = string
   description = "ECR repository name"
