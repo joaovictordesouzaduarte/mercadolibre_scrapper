@@ -150,11 +150,11 @@ aws configure
 ```bash
 aws --version
 ```
-- If you see something like the image above, you're ready
+- If you see something like the image bellow, you're ready
 
 ![Project Architecture](image.png)
 - 
-### 4. Environment Variables
+<!-- ### 4. Environment Variables
 
 Create a `.env` file in the root directory:
 
@@ -287,4 +287,4 @@ pip install -r scripts/requirements.txt --upgrade
 
 ---
 
-**Disclaimer**: This tool is for educational and research purposes. Users are responsible for ensuring compliance with applicable laws and website terms of service.
+**Disclaimer**: This tool is for educational and research purposes. Users are responsible for ensuring compliance with applicable laws and website terms of service. -->
