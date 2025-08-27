@@ -178,17 +178,22 @@ Follow these steps to get the project up and running:
     ```
     3. **Push the image to AWS ECR**
         1. **Authenticate your Docker client to the Amazon ECR registry to which you intend to push your image. Authentication tokens must be obtained for each registry used, and the tokens are valid for 12 hours.**
-        
+
        ```bash     
-            aws ecr get-login-password --region region | docker login --username AWS --password-stdin aws_account_id.dkr.ecr.region.amazonaws.com
+            aws ecr get-login-password --region region | docker login --username AWS --password-stdin YOUR-AWS-ACCOUNT-ID.dkr.ecr.region.amazonaws.com
         ```
-7. **(Optional) Deploy to AWS Lambda**
-
-   Use Terraform or the AWS CLI to deploy the Lambda function as described in the sections below.
-
----
-
-If you encounter any issues, please refer to the [Support](#-support) section or open an issue on GitHub.
+        2. **Push the image**
+        ```bash     
+            sudo docker push YOUR-AWS-ACCOUNT-ID.dkr.ecr.us-east-2.amazonaws.com/mercadolibre-scrapper-repository
+        ```
+    4. **Build the terraform image**
+        ```bash     
+            sudo docker build -f Dockerfile.terraform -t terraform_image .
+        ```
+    5. **Run the docker container based on terraform image**
+        ```bash     
+            sudo docker run -dit --name terraform_container terraform_image bin/bash
+        ```
 <!-- ### 4. Environment Variables
 
 Create a `.env` file in the root directory:
