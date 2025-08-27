@@ -207,7 +207,7 @@ Follow these steps to get the project up and running:
       ```bash
       aws configure      
       ```
-      If you see somthing like the image bellow, the aws was configure correctly
+      If you see something like the image bellow, the aws was configure correctly
       ![Project Architecture](image2.png)
 
       2. **Run the terraform**
