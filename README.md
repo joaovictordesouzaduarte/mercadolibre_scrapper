@@ -192,8 +192,13 @@ Follow these steps to get the project up and running:
         ```
     5. **Run the docker container based on terraform image**
         ```bash     
-            sudo docker run -dit --name terraform_container terraform_image bin/bash
+            sudo docker run --env-file ./.env -dit --name terraform_container terraform_image bin/bash
         ```
+    6. Once the container is running, access it by executing the following command (replace YOUR-CONTAINER-ID with your actual container ID):
+
+    ```bash
+    sudo docker exec -it YOUR-CONTAINER-ID bin/bash
+    ```
 <!-- ### 4. Environment Variables
 
 Create a `.env` file in the root directory:
