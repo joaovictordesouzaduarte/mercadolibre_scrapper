@@ -199,137 +199,23 @@ Follow these steps to get the project up and running:
     ```bash
     sudo docker exec -it YOUR-CONTAINER-ID bin/bash
     ```
-<!-- ### 4. Environment Variables
 
-Create a `.env` file in the root directory:
+3. **AWS Lambda Deployment & Terraform usage**
+   Inside the container that you've created above, follow these steps
 
-```env
-AWS_REGION=us-east-1
-S3_BUCKET_NAME=your-scraper-bucket
-LAMBDA_FUNCTION_NAME=mercadolibre-scraper
-```
+      1. **Make share that you aws cli is configured correctly.
+      ```bash
+      aws configure      
+      ```
+      If you see somthing like the image bellow, the aws was configure correctly
+      ![Project Architecture](image2.png)
 
-## 🚀 Usage
-
-### Local Development
-
+      2. **Run the terraform**
+      
 ```bash
-# Run the scraper locally
-python scripts/lambda_scrapper_mercadolibre.py
+   # Deploy infrastructure with Terraform
+   cd mercadolibre_scrapper/terraform
+   terraform init
+   terraform plan
+   terraform apply
 ```
-
-### Docker Deployment
-
-```bash
-# Build the Docker image
-docker build -f Dockerfile.lambda -t mercadolibre-scraper .
-
-# Run locally with Docker
-docker run -e AWS_ACCESS_KEY_ID=your_key -e AWS_SECRET_ACCESS_KEY=your_secret mercadolibre-scraper
-```
-
-### AWS Lambda Deployment
-
-```bash
-# Deploy infrastructure with Terraform
-cd terraform
-terraform init
-terraform plan
-terraform apply
-
-# Or deploy Lambda function directly
-aws lambda create-function \
-    --function-name mercadolibre-scraper \
-    --runtime python3.10 \
-    --role arn:aws:iam::your-account:role/lambda-execution-role \
-    --handler lambda_scrapper_mercadolibre.lambda_handler \
-    --zip-file fileb://deployment-package.zip
-```
-
-## 📊 Data Structure
-
-The scraper extracts the following product information:
-
-- Product name
-- Price
-- Seller information
-- Product ratings
-- Availability status
-- Product URL
-- Timestamp of extraction
-
-## 🔧 Configuration
-
-### Chrome Options
-
-The scraper is configured with optimized Chrome options for AWS Lambda:
-
-- Headless mode enabled
-- GPU acceleration disabled
-- Memory optimization settings
-- Custom user agent
-- Remote debugging port configuration
-
-### Selenium Settings
-
-- Implicit wait: 0 seconds (optimized for performance)
-- Explicit wait: 12 seconds for critical elements
-- Page source caching for analysis
-
-## 📁 Project Structure
-
-```
-mercadolibre_scrapper/
-├── scripts/
-│   ├── lambda_scrapper_mercadolibre.py  # Main scraper logic
-│   ├── install-browser.sh               # Browser installation script
-│   ├── requirements.txt                 # Python dependencies
-│   └── __init__.py
-├── terraform/                           # Infrastructure as Code
-├── Dockerfile.lambda                    # Lambda container definition
-├── Dockerfile.terraform                 # Terraform container
-├── chrome-deps.txt                      # Chrome dependencies
-├── aws-configure-entrypoint.sh          # AWS configuration script
-├── .gitignore                           # Git ignore rules
-└── README.md                            # This file
-```
-
-## 🚨 Important Notes
-
-- **Rate Limiting**: Be respectful of MercadoLibre's servers. Implement delays between requests if needed.
-- **Legal Compliance**: Ensure your scraping activities comply with MercadoLibre's Terms of Service.
-- **AWS Costs**: Monitor your Lambda function usage to avoid unexpected charges.
-- **Data Privacy**: Handle scraped data according to applicable privacy regulations.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-If you encounter any issues or have questions:
-
-1. Check the [Issues](https://github.com/your-username/mercadolibre_scrapper/issues) page
-2. Create a new issue with detailed information
-3. Contact the maintainers
-
-## 🔄 Updates
-
-Stay updated with the latest changes:
-
-```bash
-git pull origin main
-pip install -r scripts/requirements.txt --upgrade
-```
-
----
-
-**Disclaimer**: This tool is for educational and research purposes. Users are responsible for ensuring compliance with applicable laws and website terms of service. -->
