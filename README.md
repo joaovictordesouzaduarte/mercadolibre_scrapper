@@ -60,6 +60,8 @@ pip install -r scripts/requirements.txt
 ```
 
 ### 3. AWS Configuration
+- First, log in to the AWS Console and create a new ECR (Elastic Container Registry) repository named `mercadolibre-scrapper-repository`.
+
 - Ensure that you have the AWS CLI installed on your local machine before proceeding.
 #### How to Install AWS CLI
 
@@ -153,7 +155,35 @@ aws --version
 - If you see something like the image bellow, you're ready
 
 ![Project Architecture](image.png)
-- 
+## 🏁 How to Start the Project
+
+Follow these steps to get the project up and running:
+
+1. **Set Up Environment Variables**
+
+   Create a `.env` file in the root directory with your AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION = us-east-2 end TERRAFORM_VERSION=1.6.6.
+
+2. **Docker Usage**
+
+   To run the project in a Docker container, follow the steps bellow:
+
+    1. **Build the scrapper container:**
+   ``` bash
+   sudo docker build -t mercadolibre_scrapper:latest -f Dockerfile.lambda .
+   ```
+    2. **Tag the imagem and push to the AWS ECR:**
+   
+   ```bash     
+        sudo docker tag YOUR-CONTAINER-ID YOUR-AWS-ACCOUNT-ID.dkr.ecr.us-east-2.amazonaws.com/mercadolibre-scrapper-repository
+    ```
+
+7. **(Optional) Deploy to AWS Lambda**
+
+   Use Terraform or the AWS CLI to deploy the Lambda function as described in the sections below.
+
+---
+
+If you encounter any issues, please refer to the [Support](#-support) section or open an issue on GitHub.
 <!-- ### 4. Environment Variables
 
 Create a `.env` file in the root directory:
