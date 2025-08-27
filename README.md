@@ -171,12 +171,17 @@ Follow these steps to get the project up and running:
    ``` bash
    sudo docker build -t mercadolibre_scrapper:latest -f Dockerfile.lambda .
    ```
-    2. **Tag the imagem and push to the AWS ECR:**
+    2. **Tag the imagem**
    
    ```bash     
         sudo docker tag YOUR-CONTAINER-ID YOUR-AWS-ACCOUNT-ID.dkr.ecr.us-east-2.amazonaws.com/mercadolibre-scrapper-repository
     ```
-
+    3. **Push the image to AWS ECR**
+        1. **Authenticate your Docker client to the Amazon ECR registry to which you intend to push your image. Authentication tokens must be obtained for each registry used, and the tokens are valid for 12 hours.**
+        
+       ```bash     
+            aws ecr get-login-password --region region | docker login --username AWS --password-stdin aws_account_id.dkr.ecr.region.amazonaws.com
+        ```
 7. **(Optional) Deploy to AWS Lambda**
 
    Use Terraform or the AWS CLI to deploy the Lambda function as described in the sections below.
