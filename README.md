@@ -219,3 +219,26 @@ Follow these steps to get the project up and running:
    terraform plan
    terraform apply
 ```
+4. **Test**
+After deploying the project, you can go to the AWS Lambda console and test the deployed function. By checking the logs in AWS CloudWatch, you should see that everything was executed correctly, as the image bellow. Additionally, you can verify that the output file has been created in the specified S3 bucket.
+
+![Project Architecture](image3.png)
+
+In the S3, you can see a .csv file was saved. It's a sign that everything works!
+![Project Architecture](image4.png)
+
+
+**Contributing**
+Feel free to open PRs for any improvements, bug fixes, or new features you think would benefit the project. I appreciate your contributions and will be happy to review and accept them!
+
+**How to contribute:**
+1. Fork this repository.
+2. Create a new branch for your feature or fix.
+3. Commit your changes with clear messages.
+4. Open a Pull Request describing your changes and why they are needed.
+
+Thank you for helping make this project better!
+
+📧 Email: victorduarte.ufrj@gmail.com
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jvsduarte/)
+

@@ -156,12 +156,12 @@ def extract_data_from_website(browser):
 
 def lambda_handler(event, context):
 # def lambda_handler():
-    print("Iniciando scrapper...")
+    print("Scrapper started...")
     # Instance of webdriver
     browser = get_browser()
     
     try:
-        print('------------- Chrome iniciado com sucesso ----------------')
+        print('------------- Chrome started successfully ----------------')
         # Extract data from website
         data = extract_data_from_website(browser)
         if data:
@@ -172,19 +172,19 @@ def lambda_handler(event, context):
             current_date = datetime.now().strftime('%Y_%m_%d')
             
             # Save to file
-            print('------------- Salvando dados em CSV ----------------')            
+            print('------------- Saving data in CSV ----------------')            
             # Salva no S3
             upload_file_to_s3(buffer, 'mercadolibre-scrapper-data', f'mercadolibre_data_{current_date}.csv')
-            print(f"Dados salvos com sucesso! {len(data)} produtos extraídos.")
+            print(f"Data saved successfully! {len(data)} products extracted.")
         else:
-            print("Nenhum dado foi extraído.")
+            print("No data was extracted.")
             
     except Exception as e:
-        print('--------------------------------- Erro durante a execução: {e}')
+        print('--------------------------------- Error during execution: {e}')
     finally:
         # Close browser
         browser.quit()
-        print("Navegador fechado.")
+        print("Browser closed.")
 
 if __name__ == '__main__':
     lambda_handler()
