@@ -240,5 +240,6 @@ Feel free to open PRs for any improvements, bug fixes, or new features you think
 Thank you for helping make this project better!
 
 📧 Email: victorduarte.ufrj@gmail.com
+<br/>
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jvsduarte/)
 
