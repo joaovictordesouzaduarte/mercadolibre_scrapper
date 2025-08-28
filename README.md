@@ -201,7 +201,7 @@ Follow these steps to get the project up and running:
     ```
 
 3. **AWS Lambda Deployment & Terraform usage**
-   Inside the container that you've created above, follow these steps
+      Inside the container that you've created above, follow these steps
 
       1. **Make share that you aws cli is configured correctly.
       ```bash
@@ -210,7 +210,7 @@ Follow these steps to get the project up and running:
       If you see somthing like the image bellow, the aws was configure correctly
       ![Project Architecture](image2.png)
 
-      2. **Run the terraform**
+2. **Run the terraform**
       
 ```bash
    # Deploy infrastructure with Terraform
@@ -227,6 +227,11 @@ After deploying the project, you can go to the AWS Lambda console and test the d
 In the S3, you can see a .csv file was saved. It's a sign that everything works!
 ![Project Architecture](image4.png)
 
+5. **Remove all remote objects**
+After test, it's good to clean up all temporary infrastructure that we've created. To do that, run the terraform's destroy command.
+   ```bash
+   terraform destroy
+   ```
 
 **Contributing**
 Feel free to open PRs for any improvements, bug fixes, or new features you think would benefit the project. I appreciate your contributions and will be happy to review and accept them!
