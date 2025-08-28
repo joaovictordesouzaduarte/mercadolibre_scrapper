@@ -228,7 +228,7 @@ In S3, you can see a .csv file was saved. It's a sign that everything works!
 ![Project Architecture](image4.png)
 
 5. **Remove all remote objects**
-After test, it's good to clean up all temporary infrastructure that we've created. To do that, run the terraform's destroy command.
+After test, it's good to clean up all temporary infrastructure that we've created to make ensure that no one bills come in the next month. To do that, just run the terraform's destroy command and type "yes" when request.
    ```bash
    terraform destroy
    ```
