@@ -220,11 +220,11 @@ Follow these steps to get the project up and running:
    terraform apply
 ```
 4. **Test**
-After deploying the project, you can go to the AWS Lambda console and test the deployed function. By checking the logs in AWS CloudWatch, you should see that everything was executed correctly, as the image bellow. Additionally, you can verify that the output file has been created in the specified S3 bucket.
+   After deploying the project, you can go to the AWS Lambda console and test the deployed function. By checking the logs in AWS CloudWatch, you should see that everything was executed correctly, as the image bellow. Additionally, you can verify that the output file has been created in the specified S3 bucket.
 
 ![Project Architecture](image3.png)
 
-In the S3, you can see a .csv file was saved. It's a sign that everything works!
+In S3, you can see a .csv file was saved. It's a sign that everything works!
 ![Project Architecture](image4.png)
 
 5. **Remove all remote objects**
