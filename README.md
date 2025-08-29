@@ -24,9 +24,8 @@ A powerful web scraping solution for extracting product data from MercadoLibre (
                        │   Chrome       │
                        │   Headless     │
                        └─────────────────┘
-```
 
-```
+
 flowchart LR
     A["Mercado Libre 
     Website"] --> B{"AWS Lambda 
@@ -35,6 +34,7 @@ flowchart LR
     (Data Store)"] & D["Chrome
     Headless"]
 ```
+
 ## 📋 Prerequisites
 
 - Python 3.10+
