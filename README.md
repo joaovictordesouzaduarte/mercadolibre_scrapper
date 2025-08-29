@@ -13,8 +13,6 @@ A powerful web scraping solution for extracting product data from MercadoLibre (
 
 ## 🏗️ Architecture
 
-```
-
 ```mermaid
 flowchart LR
     A["Mercado Libre 
