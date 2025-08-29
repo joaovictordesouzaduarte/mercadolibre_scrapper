@@ -26,6 +26,9 @@ A powerful web scraping solution for extracting product data from MercadoLibre (
                        └─────────────────┘
 
 
+```
+
+```mermaid
 flowchart LR
     A["Mercado Libre 
     Website"] --> B{"AWS Lambda 
