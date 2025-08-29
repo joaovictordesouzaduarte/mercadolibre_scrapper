@@ -14,19 +14,6 @@ A powerful web scraping solution for extracting product data from MercadoLibre (
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   MercadoLibre │    │   AWS Lambda    │    │   S3 Bucket     │
-│   Website      │◄──►│   Function      │───►│   (Data Store)  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                              │
-                              ▼
-                       ┌─────────────────┐
-                       │   Chrome       │
-                       │   Headless     │
-                       └─────────────────┘
-
-
-```
 
 ```mermaid
 flowchart LR
