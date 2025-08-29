@@ -26,6 +26,15 @@ A powerful web scraping solution for extracting product data from MercadoLibre (
                        └─────────────────┘
 ```
 
+```
+flowchart LR
+    A["Mercado Libre 
+    Website"] --> B{"AWS Lambda 
+    Function"}
+    B --> C["S3 Bucket 
+    (Data Store)"] & D["Chrome
+    Headless"]
+```
 ## 📋 Prerequisites
 
 - Python 3.10+
